@@ -251,7 +251,12 @@ include_directories(${${LIBNAME}_INCLUDE_DIRS} ${${LIBNAME}_DEPEND_INCLUDE_DIRS}
 add_library(${LIBNAME} ${SOURCES} ${PUBLIC_HEADERS})
 target_link_libraries(${LIBNAME} ${${LIBNAME}_DEPEND_LIBRARIES})
 
-
+# Include locations when using the build folder
+foreach(EXPORT_LIB ${${LIBNAME}_INCLUDE_DIRS})
+  target_include_directories(${LIBNAME} PUBLIC $<BUILD_INTERFACE:${EXPORT_LIB}>)
+endforeach()
+# Include locations after install
+target_include_directories(${LIBNAME} PUBLIC $<INSTALL_INTERFACE:include>)
 
 
 #######################################
@@ -261,6 +266,7 @@ install(DIRECTORY ${INCLUDE_ROOTS} DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MAT
 
 # install libraries
 INSTALL(TARGETS ${LIBNAME}
+  EXPORT ${LIBNAME}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

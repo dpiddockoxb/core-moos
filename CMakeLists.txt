@@ -154,6 +154,8 @@ add_subdirectory(Core)
 # Config Script Creation
 #########################
 
+set(PROJECT_CONFIG_PATH "lib/cmake/${PROJECTNAME}")
+
 # Add your library's name to PROJECT_EXPORT_LIBS if you wish to have it exported
 # (This is a CACHE INTERNAL variable)
 option(ENABLE_EXPORT "do you want CMake to record this build so other projects can find it " ON)
@@ -171,6 +173,13 @@ if(1)
             ${PROJECT_EXPORT_LIBS}
             FILE
             Use${PROJECTNAME}.cmake
+            NAMESPACE MOOS::
+        )
+        install(
+            EXPORT ${PROJECT_EXPORT_LIBS}
+            FILE Use${PROJECTNAME}.cmake
+            NAMESPACE MOOS::
+            DESTINATION ${PROJECT_CONFIG_PATH}
         )
     
         set(CONFIG_FILE "${PROJECT_BINARY_DIR}/${PROJECTNAME}Config.cmake")
@@ -189,8 +198,11 @@ if(1)
             file(APPEND ${CONFIG_FILE} "ADD_DEFINITIONS(-D${DEFINE})\n")        
             #file(APPEND ${CONFIG_FILE}  "message(STATUS \"adding -D${DEFINE} as required my MOOS\")\n" )
         endforeach()
-        
-        
+
+        # make install version without all the auto generated additions
+        set(CONFIG_FILE "${PROJECT_BINARY_DIR}/install/${PROJECTNAME}Config.cmake")
+        configure_file( "cmake/ProjectConfig.cmake.in" ${CONFIG_FILE} @ONLY )
+        install(FILES "${CONFIG_FILE}" DESTINATION "${PROJECT_CONFIG_PATH}")
     endif()
 
 	if(ENABLE_EXPORT)
@@ -205,7 +217,4 @@ endif()
 #here we save a version file
 set(VERSION_FILE "${PROJECT_BINARY_DIR}/${PROJECTNAME}ConfigVersion.cmake")
 configure_file( "cmake/ProjectConfigVersion.cmake.in" ${VERSION_FILE} @ONLY )
-
-
-
-
+install(FILES ${VERSION_FILE} DESTINATION "${PROJECT_CONFIG_PATH}")
