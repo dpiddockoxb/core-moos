@@ -188,7 +188,9 @@ if(1)
         # Append libary specific lines to the generated config script
         foreach(EXPORT_LIB ${PROJECT_EXPORT_LIBS})
             file(APPEND ${CONFIG_FILE} "\n# Export variables for ${EXPORT_LIB} Library\n")
-            file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_LIBRARIES \"${${EXPORT_LIB}_LIBRARIES}\")\n")
+            # Add the namespace for backwards compatibility
+            string(REGEX REPLACE "([^;]+)" "MOOS::\\1" NAMESPACE_LIBRARIES "${${EXPORT_LIB}_LIBRARIES}")
+            file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_LIBRARIES \"${NAMESPACE_LIBRARIES}\")\n")
             file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_INCLUDE_DIRS \"${${EXPORT_LIB}_INCLUDE_DIRS}\")\n")
             file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_DEPEND_LIBRARIES \"${${EXPORT_LIB}_DEPEND_LIBRARIES}\")\n")
             file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_DEPEND_INCLUDE_DIRS \"${${EXPORT_LIB}_DEPEND_INCLUDE_DIRS}\")\n")
